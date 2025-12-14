@@ -1,0 +1,160 @@
+spring:
+  application:
+    name: purchasement
+  
+  # ======================
+  # MySQL Database Configuration
+  # ======================
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # Try 127.0.0.1 if localhost doesn't work
+    url: jdbc:mysql://127.0.0.1:3301/purchasement?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=10&initialTimeout=2&connectTimeout=30000&socketTimeout=30000
+    username: root
+    password: 123456
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+      initialization-fail-timeout: 60000
+
+  # ======================
+  # MyBatis Configuration
+  # ======================
+  mybatis:
+    mapper-locations: classpath:mapper/**/*.xml
+    type-aliases-package: com.distributed_system.purchasement.entity
+    configuration:
+      map-underscore-to-camel-case: true
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+  # ======================
+  # RabbitMQ Configuration
+  # ======================
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
+    virtual-host: /
+    listener:
+      simple:
+        acknowledge-mode: auto
+        concurrency: 1
+        max-concurrency: 10
+        prefetch: 1
+    template:
+      mandatory: true
+      retry:
+        enabled: true
+        initial-interval: 1000
+        max-attempts: 3
+        max-interval: 10000
+        multiplier: 1.0
+
+  # ======================
+  # Kafka Configuration
+  # ======================
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+      batch-size: 16384
+      linger-ms: 1
+      buffer-memory: 33554432
+    consumer:
+      group-id: purchasement-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: true
+      auto-commit-interval: 1000
+      properties:
+        spring.json.trusted.packages: "*"
+
+  # ======================
+  # Redis Configuration
+  # ======================
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: redis123
+      database: 0
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+  # ======================
+  # Security Configuration
+  # ======================
+  security:
+    user:
+      name: admin
+      password: admin
+      roles: ADMIN
+
+# ======================
+# Server Configuration
+# ======================
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+# ======================
+# XXL-JOB Configuration
+# ======================
+xxl:
+  job:
+    admin:
+      addresses: http://localhost:8088/xxl-job-admin
+    executor:
+      appname: purchasement-executor
+      address: 
+      ip: 
+      port: 9999
+      logpath: /data/applogs/xxl-job/jobhandler
+      logretentiondays: 30
+    accessToken: purchasement-168$
+
+# ======================
+# Logging Configuration
+# ======================
+logging:
+  level:
+    root: INFO
+    com.distributed_system.purchasement: DEBUG
+    org.springframework.web: INFO
+    org.mybatis: DEBUG
+    org.springframework.kafka: INFO
+    org.springframework.amqp: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# ======================
+# Management/Actuator (Optional)
+# ======================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
