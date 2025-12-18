@@ -8,7 +8,7 @@ import lombok.Data;
 public class User {
 
     private String username;
-    private String age;
+    private int age;
 
     // Default constructor for deserialization
     public User() {
@@ -16,6 +16,6 @@ public class User {
 
     public User(String username, int age) {
         this.username = username;
-        this.age = String.valueOf(age);
+        this.age = age;
     }
 }
